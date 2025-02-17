@@ -83,9 +83,11 @@ retriever = Retrieve(
    * Tracks page numbers
    * Maintains text-metadata relationships
 
-## Example
+## Example Usage
 
 ```python
+from vectordb import Retrieve
+
 def main():
     processor = Retrieve()
     pdf_path = "example.pdf"
