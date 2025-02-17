@@ -86,7 +86,7 @@ retriever = Retrieve(
 ## Example Usage
 
 ```python
-from vectordb import Retrieve
+from pdfsearch import Retrieve
 
 def main():
     processor = Retrieve()
