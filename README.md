@@ -1,16 +1,17 @@
-# PDF retreival
-
+# PDF Semantic Search
 A Python-based semantic search system for PDF documents that uses transformer models to enable intelligent, meaning-based document retrieval.
 
 ## Features
-
 * Semantic search capabilities using transformer models
 * Fast similarity search using FAISS indexing
 * Score-based ranking of search results
 * Page number tracking for result localization
+* Configurable text chunking with overlap
+* Batch processing for efficient embedding generation
+* Support for multiple transformer models
+* Memory-efficient document processing
 
-### Prerequisites
-
+## Prerequisites
 * Python 3.7+
 
 **Dependencies:**
@@ -22,29 +23,46 @@ A Python-based semantic search system for PDF documents that uses transformer mo
 * `numpy`
 * `scipy`
 
-### Basic Usage
+## Installation
 
-```python
-from pdf_retrieval import Retrieve
+```bash
+# Clone the repository
+git clone https://github.com/tarundevs/vectordb.git
+cd pdf-semantic-search
 
-# Initialize the retriever
-retriever = Retrieve()
+# Create a virtual environment in windows (optional but recommended)
+python -m venv venv
+venv\Scripts\activate
 
-# Process a PDF document
-retriever.process_document("path/to/your/document.pdf")
-
-# Perform a search
-results = retriever.search("Your search query here", k=5)
-
-# Access results
-for result in results:
-    print(f"Score: {result['score']}")
-    print(f"Page: {result['metadata']['page_number']}")
-    print(f"Text: {result['text']}")
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-#### Chunk Text Configuration
+## Basic Usage
 
+### Running the Script
+The script can be executed from the command line with the following syntax:
+```bash
+python main.py <pdf_path> <query> [k]
+```
+
+### Example usage
+```bash
+python main.py example.pdf "What is machine learning?"
+```
+
+```bash
+python main.py research_paper.pdf "Explain the role of transformers in NLP." 5
+```
+
+Where:
+- `pdf_path`: Path to the PDF document
+- `query`: Search query text
+- `k`: Number of results to return (optional, default=3)
+
+### Configuration
+
+#### Chunk Text Configuration
 ```python
 chunker = ChunkText(
     sentences_per_chunk=5,    # Number of sentences per chunk
@@ -54,10 +72,12 @@ chunker = ChunkText(
 ```
 
 #### Retriever Configuration
-
 ```python
 retriever = Retrieve(
-    batch_size=32            # Batch size for processing embeddings
+    batch_size=32,           # Batch size for processing embeddings
+    model_name='all-MiniLM-L6-v2',  # Name of the transformer model
+    use_gpu=True,           # Whether to use GPU for computation
+    index_type='L2'         # FAISS index type ('L2' or 'IP')
 )
 ```
 
@@ -70,6 +90,8 @@ retriever = Retrieve(
    * Configurable chunk sizes and overlap
    * Token limit enforcement
    * BERT tokenizer integration
+   * Sentence boundary detection
+   * Overlap management
 
 2. **Retrieve Class**
    * Main processing pipeline
@@ -77,34 +99,11 @@ retriever = Retrieve(
    * Embedding generation
    * FAISS index management
    * Search functionality
+   * Result ranking and scoring
+   * Batch processing optimization
 
 3. **Metadata Class**
    * Stores chunk information
    * Tracks page numbers
    * Maintains text-metadata relationships
-
-## Example Usage
-
-```python
-from pdfsearch import Retrieve
-
-def main():
-    processor = Retrieve()
-    pdf_path = "your_pdf_document.pdf"
-
-    # Process the document
-    processor.process_document(pdf_path)
-
-    # Perform a search
-    query = "What is the reinforcement learning task?"
-    results = processor.search(query, k=3)
-
-    # Display results
-    for i, result in enumerate(results, 1):
-        print(f"\n{i}. Score: {result['score']:.3f}")
-        print(f"Page: {result['metadata']['page_number']}")
-        print(f"Text: {result['text'][:500]}...")
-
-if __name__ == "__main__":
-    main()
-```
+   * Facilitates result contextualization
