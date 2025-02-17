@@ -1,41 +1,108 @@
-# Vector Search Evaluator
+# PDF retreival with faiss
 
-This project evaluates the performance of a vector-based search engine using the **Sentence Transformers** library and **ChromaDB**. It creates a synthetic test dataset and measures the precision, recall, and latency of the search engine based on a set of known relevant document-query pairs.
+A Python-based semantic search system for PDF documents that uses transformer models to enable intelligent, meaning-based document retrieval.
 
-## Table of Contents
+## Features
 
-- [Introduction](#introduction)
-- [What It Uses](#what-it-uses)
-- [Dependencies](#dependencies)
+* Semantic search capabilities using transformer models
+* Fast similarity search using FAISS indexing
+* Score-based ranking of search results
+* Page number tracking for result localization
 
-## Introduction
+### Prerequisites
 
-The **Vector Search Evaluator** is designed to evaluate the search performance of a vector-based search engine. It uses the **SentenceTransformer** model to embed text documents and queries into high-dimensional vectors, which are then stored in **ChromaDB**. The evaluation involves querying the database using synthetic test queries and comparing the retrieved documents with the known relevant documents. The primary focus is on measuring search precision, recall, and latency.
+* Python 3.7+
 
-## What It Uses
+**Dependencies:**
+* `sentence-transformers`
+* `faiss-gpu` (or `faiss-cpu`)
+* `transformers`
+* `nltk`
+* `PyMuPDF` (fitz)
+* `numpy`
+* `scipy`
 
-1. **Sentence Transformers**:
-   - Used to convert text documents and queries into vector embeddings. This enables semantic search by comparing the similarity between vectors.
+### Basic Usage
 
-2. **ChromaDB**:
-   - A vector database for storing document embeddings and performing similarity searches. It is used for efficient document retrieval based on query embeddings.
+```python
+from pdf_retrieval import Retrieve
 
-3. **Evaluation Metrics**:
-   - **Precision**: The proportion of relevant documents retrieved among the top `k` results.
-   - **Recall**: The proportion of relevant documents retrieved out of all relevant documents for a given query.
-   - **Latency**: The time taken to retrieve the results from the database.
+# Initialize the retriever
+retriever = Retrieve()
 
-4. **Synthetic Test Dataset**:
-   - The test dataset consists of three groups of documents: **Technology**, **Nature**, and **Space**. Each group is paired with a set of queries that are expected to retrieve relevant documents from the group.
+# Process a PDF document
+retriever.process_document("path/to/your/document.pdf")
 
-5. **Performance Evaluation**:
-   - The system evaluates the search engine using various test queries and calculates precision, recall, and latency for the top `k` retrieved documents.
+# Perform a search
+results = retriever.search("Your search query here", k=5)
 
-## Dependencies
+# Access results
+for result in results:
+    print(f"Score: {result['score']}")
+    print(f"Page: {result['metadata']['page_number']}")
+    print(f"Text: {result['text']}")
+```
 
-The following Python libraries are required to run this project:
+#### Chunk Text Configuration
 
-- `sentence-transformers` - for converting text into embeddings.
-- `chromadb` - for creating a persistent vector database and performing similarity queries.
-- `numpy` - for numerical operations and calculating metrics.
-- `time` - for measuring latency.
+```python
+chunker = ChunkText(
+    sentences_per_chunk=5,    # Number of sentences per chunk
+    overlap_sentences=2,      # Number of overlapping sentences
+    max_chunk_size=512       # Maximum tokens per chunk
+)
+```
+
+#### Retriever Configuration
+
+```python
+retriever = Retrieve(
+    batch_size=32            # Batch size for processing embeddings
+)
+```
+
+## Architecture
+
+### Components
+
+1. **ChunkText Class**
+   * Handles document text chunking
+   * Configurable chunk sizes and overlap
+   * Token limit enforcement
+   * BERT tokenizer integration
+
+2. **Retrieve Class**
+   * Main processing pipeline
+   * PDF text extraction
+   * Embedding generation
+   * FAISS index management
+   * Search functionality
+
+3. **Metadata Class**
+   * Stores chunk information
+   * Tracks page numbers
+   * Maintains text-metadata relationships
+
+## Example
+
+```python
+def main():
+    processor = Retrieve()
+    pdf_path = "example.pdf"
+
+    # Process the document
+    processor.process_document(pdf_path)
+
+    # Perform a search
+    query = "What is the reinforcement learning task?"
+    results = processor.search(query, k=3)
+
+    # Display results
+    for i, result in enumerate(results, 1):
+        print(f"\n{i}. Score: {result['score']:.3f}")
+        print(f"Page: {result['metadata']['page_number']}")
+        print(f"Text: {result['text'][:500]}...")
+
+if __name__ == "__main__":
+    main()
+```
