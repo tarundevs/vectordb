@@ -1,4 +1,4 @@
-# PDF retreival with faiss
+# PDF retreival
 
 A Python-based semantic search system for PDF documents that uses transformer models to enable intelligent, meaning-based document retrieval.
 
@@ -90,7 +90,7 @@ from pdfsearch import Retrieve
 
 def main():
     processor = Retrieve()
-    pdf_path = "example.pdf"
+    pdf_path = "your_pdf_document.pdf"
 
     # Process the document
     processor.process_document(pdf_path)
