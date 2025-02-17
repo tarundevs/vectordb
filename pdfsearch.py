@@ -11,7 +11,7 @@ from nltk.tokenize import sent_tokenize
 import fitz
 from scipy.special import softmax
 
-nltk.download('punkt')
+nltk.download('punkt_tab')
 
 @dataclass
 class metadata:
